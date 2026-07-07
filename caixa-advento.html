@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Projeto: Caixa do Advento 3D - Completo (Verso Incluso)</title>
+    <style>
+        :root {
+            /* Padrão das portas e do verso */
+            --bg-portas: url(blue), #ffffff;
+            --tamanho-padrao-portas: auto;
+            --bg-repeat-portas: no-repeat;
+            
+            /* Padrão do painel central interno (box) */
+            --bg-caixas: url(box.png);
+            --tamanho-padrao-caixas: cover;
+        }
+
+        body { 
+            font-family: 'Arial', sans-serif; 
+            background: #f4f6f9; 
+            padding: 30px 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            margin: 0;
+        }
+        
+        .header-info {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #1e293b;
+            max-width: 800px;
+        }
+
+        .header-info h2 { margin: 0 0 8px 0; font-size: 24px; text-transform: uppercase; }
+        .header-info p { margin: 0; color: #64748b; font-size: 14px; }
+
+        /* Painel Interativo */
+        .painel-controle {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 35px;
+            width: 100%;
+            max-width: 750px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .painel-controle h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #1e293b;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+
+        .painel-secao {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .painel-secao-titulo {
+            font-size: 14px;
+            font-weight: bold;
+            color: #475569;
+        }
+
+        .opcoes-grupo {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-upload {
+            background-color: #1e293b;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        
+        .btn-upload.gold {
+            background-color: #D4AF37;
+            color: #1e293b;
+        }
+
+        .btn-upload:hover { background-color: #334155; }
+        .btn-upload.gold:hover { background-color: #b5922f; color: white; }
+        
+        input[type="file"] { display: none; }
+
+        .select-style {
+            padding: 9px 12px;
+            border-radius: 5px;
+            border: 1px solid #cbd5e1;
+            background-color: white;
+            font-size: 13px;
+            color: #334155;
+        }
+
+        /* DIVISOR DE SEÇÕES */
+        hr.section-divider {
+            width: 100%;
+            max-width: 1000px;
+            border: 0;
+            height: 1px;
+            background: #cbd5e1;
+            margin: 40px 0;
+        }
+
+        /* Palco 3D (Portas) */
+        .stage-3d {
+            perspective: 1500px;
+            text-align: center;
+            white-space: nowrap;
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        .door {
+            display: inline-block;
+            width: 300px; 
+            height: 500px; 
+            vertical-align: bottom;
+            box-sizing: border-box;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            transition: transform 0.5s ease;
+            border: 3px solid #1e293b;
+            
+            background: var(--bg-portas);
+            background-size: var(--tamanho-padrao-portas);
+            background-repeat: var(--bg-repeat-portas);
+        }
+
+        .left-door {
+            border-right: 1px dashed #cbd5e1;
+            transform: rotateY(55deg);
+            transform-origin: right center;
+            border-radius: 8px 0 0 8px;
+            background-position: left center;
+        }
+
+        .left-door::after {
+            content: '';
+            position: absolute;
+            right: -1px; 
+            top: 50%;
+            transform: translateY(-50%);
+            width: 70px; 
+            height: 100px;
+            background: #ffffff;
+            border-radius: 100% 0 0 100% / 50% 0 0 50%; 
+            z-index: 5;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.08);
+        }
+
+        .right-door {
+            border-left: 1px dashed #cbd5e1;
+            transform: rotateY(-55deg);
+            transform-origin: left center;
+            border-radius: 0 8px 8px 0;
+            background-position: right center;
+        }
+
+        .right-door::after {
+            content: '';
+            position: absolute;
+            left: -1px; 
+            top: 50%;
+            transform: translateY(-50%);
+            width: 70px; 
+            height: 100px;
+            background: #ffffff;
+            border-radius: 0 100% 100% 0 / 0 50% 50% 0; 
+            z-index: 5;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.08);
+        }
+
+        .door-tag {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(30, 41, 59, 0.85);
+            color: #ffffff;
+            padding: 6px 12px;
+            font-size: 11px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: bold;
+        }
+
+        /* Estrutura Central Interna */
+        .blueprint-container {
+            display: inline-block;
+            position: relative;
+            width: 600px; 
+            height: 500px; 
+            border: 3px solid #1e293b;
+            vertical-align: bottom;
+            box-sizing: border-box;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            
+            background: var(--bg-caixas);
+            background-size: var(--tamanho-padrao-caixas);
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* ESTÁGIO 2: CAIXA FECHADA (FRENTE) */
+        .stage-closed, .stage-back {
+            text-align: center;
+            margin-bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stage-closed h3, .stage-back h3 {
+            color: #1e293b;
+            font-size: 20px;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+        }
+
+        .stage-closed p, .stage-back p {
+            color: #64748b;
+            font-size: 14px;
+            margin: 0 0 30px 0;
+            max-width: 600px;
+        }
+
+        .closed-box {
+            width: 600px;
+            height: 500px;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 4px solid #1e293b;
+            border-radius: 4px;
+            
+            background: var(--bg-portas);
+            background-size: var(--tamanho-padrao-portas);
+            background-position: center;
+            background-repeat: var(--bg-repeat-portas);
+        }
+
+        /* Elipse central de 7x5 cm na frente */
+        .closed-box::before {
+            content: '';
+            position: absolute;
+            width: 140px;
+            height: 100px;
+            background: #ffffff;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Linha divisória da frente */
+        .closed-box::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(30, 41, 59, 0.4);
+            box-shadow: -1px 0 0px rgba(255, 255, 255, 0.4);
+            transform: translateX(-50%);
+            z-index: 2; 
+        }
+
+        /* ESTÁGIO 3: VERSO DA CAIXA */
+        .back-box {
+            width: 600px; /* 300mm */
+            height: 500px; /* 250mm */
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 4px solid #1e293b;
+            border-radius: 4px;
+            display: flex;
+            justify-content: center; /* Centraliza horizontalmente o retângulo */
+            align-items: center; /* Centraliza verticalmente o retângulo */
+            
+            /* Utiliza a mesma arte das portas/frente */
+            background: var(--bg-portas);
+            background-size: var(--tamanho-padrao-portas);
+            background-position: center;
+            background-repeat: var(--bg-repeat-portas);
+        }
+
+        /* Retângulo branco translúcido 20x15 cm */
+        .back-rectangle {
+            width: 400px; /* 200mm (20cm) */
+            height: 300px; /* 150mm (15cm) */
+            background-color: rgba(255, 255, 255, 0.7); /* Branco 70% translúcido */
+            border-radius: 4px; /* Bordas levemente arredondadas */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Sombra sutil para separar do fundo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px dashed rgba(30, 41, 59, 0.3); /* Linha pontilhada sutil de marcação */
+            
+            /* Estilo do texto indicativo */
+            color: #334155;
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-info">
+        <h2>Visualizador de Padronagem Completo</h2>
+        <p>Mockup completo com portas, painel de gavetas, vista fechada e verso da embalagem.</p>
+    </div>
+
+    <div class="painel-controle">
+        <h3>Ajustar Arte do Fornecedor</h3>
+        
+        <div class="painel-secao">
+            <span class="painel-secao-titulo">1. Padrão Externo (Portas Laterais, Caixa Fechada e Verso)</span>
+            <div class="opcoes-grupo">
+                <label class="btn-upload" for="upload-arte-portas">
+                    Selecionar Padrão Externo
+                </label>
+                <input type="file" id="upload-arte-portas" accept="image/*">
+                
+                <select id="ajuste-escala-portas" class="select-style">
+                    <option value="cover">Preencher Painel (Cover)</option>
+                    <option value="contain">Ajustar Proporção (Contain)</option>
+                    <option value="repeat">Repetir Textura (Tile/Lado a Lado)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="painel-secao">
+            <span class="painel-secao-titulo">2. Arte Interna (Base das Gavetas)</span>
+            <div class="opcoes-grupo">
+                <label class="btn-upload gold" for="upload-arte-caixas">
+                    Selecionar Arquivo Box (Interno)
+                </label>
+                <input type="file" id="upload-arte-caixas" accept="image/*">
+                
+                <select id="ajuste-escala-caixas" class="select-style">
+                    <option value="cover">Esticar (Cover)</option>
+                    <option value="contain">Encaixar Inteiro (Contain)</option>
+                    <option value="100% 100%">Forçar Preenchimento Total (100%)</option>
+                </select>
+                
+                <button id="reset-padrao" class="select-style" style="cursor:pointer; font-weight:bold; margin-left:auto;">Restaurar Padrões</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="stage-3d">
+        <div class="door left-door" id="porta-esq">
+            <div class="door-tag">Painel Esquerdo</div>
+        </div>
+
+        <div class="blueprint-container"></div>
+
+        <div class="door right-door" id="porta-dir">
+            <div class="door-tag">Painel Direito</div>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="stage-closed">
+        <h3>Perfil: Frente da Caixa Fechada</h3>
+        <p>Arte contínua com elipse central de 7x5 cm onde os painéis de 150mm se encontram.</p>
+        <div class="closed-box"></div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="stage-back">
+        <h3>Perfil: Verso da Caixa</h3>
+        <p>Aplicação contínua da mesma arte externa com área translúcida central (70% de opacidade) de 20x15 cm para dados, textos e códigos.</p>
+        <div class="back-box">
+            <div class="back-rectangle">
+                Área Translúcida (20x15 cm)<br>70% Opacidade
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const rootElement = document.documentElement;
+
+        // Portas, Frente Fechada e Verso
+        const uploadArtePortas = document.getElementById('upload-arte-portas');
+        const ajusteEscalaPortas = document.getElementById('ajuste-escala-portas');
+        const padraoOriginalPortas = "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"60\" height=\"60\" viewBox=\"0 0 60 60\"><path d=\"M0 10.5c0-1.5 1.5-3 3-3s3 1.5 3 3v39c0 1.5-1.5 3-3 3s-3-1.5-3-3v-39zm10 5c0-1.5 1.5-3 3-3s3 1.5 3 3v29c0 1.5-1.5 3-3 3s-3-1.5-3-3v-29zm10-10c0-1.5 1.5-3 3-3s3 1.5 3 3v49c0 1.5-1.5 3-3 3s-3-1.5-3-3v-49zm10 15c0-1.5 1.5-3 3-3s3 1.5 3 3v19c0 1.5-1.5 3-3 3s-3-1.5-3-3v-19zm10-10c0-1.5 1.5-3 3-3s3 1.5 3 3v39c0 1.5-1.5 3-3 3s-3-1.5-3-3v-39zm10 15c0-1.5 1.5-3 3-3s3 1.5 3 3v9c0 1.5-1.5 3-3 3s-3-1.5-3-3v-9z\" fill=\"%23008080\" fill-opacity=\"0.15\"/></svg>'), #ffffff";
+
+        uploadArtePortas.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    rootElement.style.setProperty('--bg-portas', `url('${event.target.result}')`);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        ajusteEscalaPortas.addEventListener('change', function(e) {
+            const val = e.target.value;
+            if (val === 'repeat') {
+                rootElement.style.setProperty('--tamanho-padrao-portas', 'auto');
+                rootElement.style.setProperty('--bg-repeat-portas', 'repeat');
+            } else {
+                rootElement.style.setProperty('--tamanho-padrao-portas', val);
+                rootElement.style.setProperty('--bg-repeat-portas', 'no-repeat');
+            }
+        });
+
+        // Painel Central Interno
+        const uploadArteCaixas = document.getElementById('upload-arte-caixas');
+        const ajusteEscalaCaixas = document.getElementById('ajuste-escala-caixas');
+        const padraoOriginalCaixas = "#ffffff url('box.jpg')"; 
+
+        uploadArteCaixas.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    rootElement.style.setProperty('--bg-caixas', `#ffffff url('${event.target.result}')`);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        ajusteEscalaCaixas.addEventListener('change', function(e) {
+            rootElement.style.setProperty('--tamanho-padrao-caixas', e.target.value);
+        });
+
+        // Restaurar Padrões
+        document.getElementById('reset-padrao').addEventListener('click', function() {
+            rootElement.style.setProperty('--bg-portas', padraoOriginalPortas);
+            rootElement.style.setProperty('--tamanho-padrao-portas', 'auto');
+            rootElement.style.setProperty('--bg-repeat-portas', 'no-repeat');
+            ajusteEscalaPortas.value = 'cover';
+            uploadArtePortas.value = '';
+            
+            rootElement.style.setProperty('--bg-caixas', padraoOriginalCaixas);
+            rootElement.style.setProperty('--tamanho-padrao-caixas', 'cover');
+            ajusteEscalaCaixas.value = 'cover';
+            uploadArteCaixas.value = '';
+        });
+    </script>
+</body>
+</html>
